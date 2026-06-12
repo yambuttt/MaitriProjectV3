@@ -83,9 +83,43 @@
             ::-webkit-scrollbar-thumb:hover {
                 background: #4f4f4f;
             }
+
+            /* Cyber Hacked Screen Glitch Effects */
+            @keyframes hackGlitch1 {
+                0% { clip-path: inset(40% 0 61% 0); transform: skew(0.3deg); filter: hue-rotate(90deg) saturate(1.5); }
+                20% { clip-path: inset(92% 0 1% 0); transform: skew(-0.5deg); filter: hue-rotate(-50deg); }
+                40% { clip-path: inset(15% 0 80% 0); transform: skew(0.8deg); }
+                60% { clip-path: inset(80% 0 5% 0); transform: skew(-0.8deg); filter: hue-rotate(180deg) contrast(1.5); }
+                80% { clip-path: inset(3% 0 92% 0); transform: skew(0.5deg); }
+                100% { clip-path: inset(0 0 0 0); transform: skew(0); }
+            }
+            @keyframes hackGlitch2 {
+                0% { transform: translate(3px, 2px) rotate(0.3deg); }
+                20% { transform: translate(-2px, -3px) rotate(-0.3deg) skewX(8deg); }
+                40% { transform: translate(-5px, 0px) rotate(0deg); }
+                60% { transform: translate(0px, 3px) rotate(0deg); }
+                80% { transform: translate(2px, -2px) rotate(0.5deg) skewY(4deg); }
+                100% { transform: translate(0, 0) rotate(0) skew(0); }
+            }
+            .cyber-glitch-active {
+                animation: hackGlitch2 0.25s linear;
+                position: relative;
+                text-shadow: 1.5px 0 0 #ff00c1, -1.5px 0 0 #00fff9;
+            }
+            .cyber-glitch-active::after {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background: rgba(6, 182, 212, 0.08);
+                z-index: 99999;
+                pointer-events: none;
+                mix-blend-mode: color-dodge;
+                animation: hackGlitch1 0.25s linear;
+            }
         </style>
     </head>
     <body class="bg-ide-editor text-[#d4d4d4] min-h-screen relative overflow-x-hidden antialiased selection:bg-cyan-500/20 selection:text-cyan-200">
+
         
         <!-- Editor background grids -->
         <div class="absolute inset-0 editor-grid pointer-events-none z-0"></div>
@@ -121,5 +155,30 @@
             <div class="h-20 lg:hidden"></div>
         @endif
 
+        <!-- Random Cyber Hacked Glitch Driver -->
+        <script data-navigate-once>
+            (function() {
+                if (window.cyberGlitchActiveRegistered) return;
+                window.cyberGlitchActiveRegistered = true;
+
+                const triggerGlitch = () => {
+                    const target = document.body;
+                    if (!target) return;
+                    
+                    target.classList.add('cyber-glitch-active');
+                    
+                    setTimeout(() => {
+                        target.classList.remove('cyber-glitch-active');
+                    }, 250);
+                    
+                    // Schedule next random screen glitch between 6 to 15 seconds
+                    const nextTime = Math.random() * 9000 + 6000;
+                    setTimeout(triggerGlitch, nextTime);
+                };
+
+                // Start first glitch schedule in 5-10 seconds
+                setTimeout(triggerGlitch, Math.random() * 5000 + 5000);
+            })();
+        </script>
     </body>
 </html>

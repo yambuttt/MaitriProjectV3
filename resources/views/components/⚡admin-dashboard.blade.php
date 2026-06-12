@@ -396,7 +396,7 @@ new class extends Component
             <span class="px-2.5 py-1 bg-cyan-950/40 border border-cyan-800/40 rounded text-cyan-400 font-bold shrink-0">
                 NODE_TUNNEL: SECURE
             </span>
-            <a href="/" class="px-2.5 py-1 bg-[#252526] hover:bg-[#2d2d2e] border border-ide rounded text-slate-300 font-bold font-mono hover:text-white transition-colors shrink-0">
+            <a href="/" wire:navigate class="px-2.5 py-1 bg-[#252526] hover:bg-[#2d2d2e] border border-ide rounded text-slate-300 font-bold font-mono hover:text-white transition-colors shrink-0">
                 // PUBLIC_STORE
             </a>
             <button wire:click="logout" class="px-2.5 py-1 bg-rose-950/40 hover:bg-rose-900/40 border border-rose-800/40 rounded text-rose-400 font-bold font-mono transition-colors shrink-0">

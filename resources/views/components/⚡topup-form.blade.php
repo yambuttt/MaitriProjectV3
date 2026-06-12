@@ -954,7 +954,7 @@ new class extends Component
 
                 <!-- Simulated code response -->
                 <div class="text-[9px] text-slate-500 bg-ide-editor p-2.5 rounded border border-ide font-mono">
-                    <span class="text-green-500">System:</span> Transaction logged. Visit <a href="/tracker" class="text-[#4fc1ff] underline">// order_tracker.py</a> with invoice_id to check dispatch status.
+                    <span class="text-green-500">System:</span> Transaction logged. Visit <a href="/tracker" wire:navigate class="text-[#4fc1ff] underline">// order_tracker.py</a> with invoice_id to check dispatch status.
                 </div>
             @endif
 

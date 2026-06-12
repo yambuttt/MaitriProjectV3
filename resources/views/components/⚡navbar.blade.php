@@ -59,7 +59,7 @@ new class extends Component
         <!-- Left side: Logo & Tabs -->
         <div class="flex items-center gap-4 self-stretch min-w-0">
             <!-- Logo -->
-            <a href="/" class="flex items-center gap-1.5 shrink-0 hover:opacity-90 transition-opacity">
+            <a href="/" wire:navigate class="flex items-center gap-1.5 shrink-0 hover:opacity-90 transition-opacity">
                 <span class="text-cyan-400 font-bold font-mono">&lt;</span>
                 <span class="font-space font-bold tracking-wider text-white text-sm">MAITRI_STORE</span>
                 <span class="text-cyan-400 font-bold font-mono">/&gt;</span>
@@ -68,21 +68,21 @@ new class extends Component
             <!-- Tabs listing (Hidden on mobile/tablet) -->
             <div class="hidden md:flex items-center gap-1 self-stretch overflow-x-auto scrollbar-none text-xs border-l border-ide pl-4 h-full">
                 <!-- Home Tab -->
-                <a href="/" class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('/') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
-                    <span class="text-amber-500 font-bold">{}</span>
+                <a href="/" wire:navigate class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('/') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
+                    <span class="text-amber-500 font-bold font-mono">{}</span>
                     <span>home.json</span>
                 </a>
 
                 <!-- Tracker Tab -->
-                <a href="/tracker" class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('tracker') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
-                    <span class="text-sky-400 font-bold">py</span>
+                <a href="/tracker" wire:navigate class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('tracker') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
+                    <span class="text-sky-400 font-bold font-mono">py</span>
                     <span>order_tracker.py</span>
                 </a>
 
                 @if(auth()->check() && auth()->user()->isAdmin())
                     <!-- Admin Tab -->
-                    <a href="/admin/dashboard" class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('admin/dashboard') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
-                        <span class="text-rose-500 font-bold">rs</span>
+                    <a href="/admin/dashboard" wire:navigate class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('admin/dashboard') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
+                        <span class="text-rose-500 font-bold font-mono">rs</span>
                         <span>admin_dashboard.rs</span>
                     </a>
                 @endif
@@ -148,7 +148,7 @@ new class extends Component
                     <div class="text-[9px] font-bold text-slate-500 uppercase px-2.5 py-1 tracking-wider">// COMMAND_PALETTE_MATCH</div>
                     <div class="space-y-0.5 mt-1">
                         @foreach($searchResults as $res)
-                            <a href="/product/{{ $res['slug'] }}" @click="$wire.clearSearch()" class="flex items-center gap-2.5 p-2 rounded hover:bg-[#2a2d2e] transition-colors text-xs">
+                            <a href="/product/{{ $res['slug'] }}" wire:navigate @click="$wire.clearSearch()" class="flex items-center gap-2.5 p-2 rounded hover:bg-[#2a2d2e] transition-colors text-xs">
                                 <img src="{{ $res['logo'] }}" alt="{{ $res['name'] }}" class="w-6 h-6 rounded bg-slate-900 object-cover border border-white/5 shrink-0">
                                 <div class="min-w-0">
                                     <div class="font-bold text-slate-200 truncate">{{ $res['name'] }}</div>
@@ -207,7 +207,7 @@ new class extends Component
                 style="display: none;"
             >
                 @foreach($searchResults as $res)
-                    <a href="/product/{{ $res['slug'] }}" @click="mobileMenuOpen = false; $wire.clearSearch()" class="flex items-center gap-2 p-2 rounded hover:bg-[#2a2d2e]">
+                    <a href="/product/{{ $res['slug'] }}" wire:navigate @click="mobileMenuOpen = false; $wire.clearSearch()" class="flex items-center gap-2 p-2 rounded hover:bg-[#2a2d2e]">
                         <img src="{{ $res['logo'] }}" alt="{{ $res['name'] }}" class="w-6 h-6 rounded bg-slate-900 object-cover border border-white/5 shrink-0">
                         <div class="truncate text-slate-300">{{ $res['name'] }}</div>
                     </a>
@@ -216,18 +216,18 @@ new class extends Component
         </div>
 
         <nav class="flex flex-col gap-1 font-medium text-xs">
-            <a href="/" @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
+            <a href="/" wire:navigate @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
                 <span>// home.json</span>
-                <span class="text-amber-500 font-bold">{}</span>
+                <span class="text-amber-500 font-bold font-mono">{}</span>
             </a>
-            <a href="/tracker" @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
+            <a href="/tracker" wire:navigate @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
                 <span>// order_tracker.py</span>
-                <span class="text-sky-400 font-bold">py</span>
+                <span class="text-sky-400 font-bold font-mono">py</span>
             </a>
             @if(auth()->check() && auth()->user()->isAdmin())
-                <a href="/admin/dashboard" @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
+                <a href="/admin/dashboard" wire:navigate @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
                     <span>// admin_dashboard.rs</span>
-                    <span class="text-rose-500 font-bold">rs</span>
+                    <span class="text-rose-500 font-bold font-mono">rs</span>
                 </a>
             @endif
         </nav>
