@@ -19,3 +19,16 @@ Route::get('/tracker', function () {
 Route::get('/counter', function () {
     return view('demo');
 });
+
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::get('/admin/dashboard', function () {
+    return view('admin');
+})->name('admin.dashboard');
+
+Route::get('/user/dashboard', function () {
+    return "Ini dashboard user";
+})->name('user.dashboard');
+

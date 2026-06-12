@@ -254,6 +254,14 @@ class DatabaseSeeder extends Seeder
             'name' => 'Maitri Admin',
             'email' => 'admin@maitri.com',
             'password' => bcrypt('password'),
+            'role' => 'admin',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Maitri User',
+            'email' => 'user@maitri.com',
+            'password' => bcrypt('password'),
+            'role' => 'user',
         ]);
     }
 }

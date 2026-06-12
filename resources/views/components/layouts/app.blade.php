@@ -117,7 +117,9 @@
         </footer>
 
         <!-- Spacer for mobile fixed checkout bar -->
-        <div class="h-20 lg:hidden"></div>
+        @if(request()->is('product/*'))
+            <div class="h-20 lg:hidden"></div>
+        @endif
 
     </body>
 </html>

@@ -79,6 +79,14 @@ new class extends Component
                     <span>order_tracker.py</span>
                 </a>
 
+                @if(auth()->check() && auth()->user()->isAdmin())
+                    <!-- Admin Tab -->
+                    <a href="/admin/dashboard" class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('admin/dashboard') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
+                        <span class="text-rose-500 font-bold">rs</span>
+                        <span>admin_dashboard.rs</span>
+                    </a>
+                @endif
+
                 <!-- Other tabs simulated -->
                 <div class="hidden lg:flex items-center gap-2 px-4 h-full border-r border-ide text-slate-600 select-none">
                     <span class="text-emerald-500">go</span>
@@ -216,6 +224,12 @@ new class extends Component
                 <span>// order_tracker.py</span>
                 <span class="text-sky-400 font-bold">py</span>
             </a>
+            @if(auth()->check() && auth()->user()->isAdmin())
+                <a href="/admin/dashboard" @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
+                    <span>// admin_dashboard.rs</span>
+                    <span class="text-rose-500 font-bold">rs</span>
+                </a>
+            @endif
         </nav>
     </div>
 
