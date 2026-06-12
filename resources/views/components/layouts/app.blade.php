@@ -124,36 +124,38 @@
         <!-- Editor background grids -->
         <div class="absolute inset-0 editor-grid pointer-events-none z-0"></div>
 
-        <!-- Sticky Code Editor Tab-Bar / Navbar -->
-        <livewire:navbar />
+        <div id="glitch-wrapper" class="min-h-screen flex flex-col relative z-10">
+            <!-- Sticky Code Editor Tab-Bar / Navbar -->
+            <livewire:navbar />
 
-        <!-- Main Workspace container -->
-        <main class="relative z-10 container mx-auto px-4 md:px-6 py-6 min-h-[calc(100vh-160px)]">
-            {{ $slot }}
-        </main>
+            <!-- Main Workspace container -->
+            <main class="relative z-10 container mx-auto px-4 md:px-6 py-6 min-h-[calc(100vh-160px)] flex-1">
+                {{ $slot }}
+            </main>
 
-        <!-- IDE Status Bar Footer -->
-        <footer class="relative z-[5] border-t border-ide bg-[#007acc] text-white py-1.5 px-4 font-mono text-[10px] flex justify-between items-center select-none">
-            <div class="flex items-center gap-4">
-                <span class="bg-[#0066a1] px-2 py-0.5 font-bold flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping"></span>
-                    SSH: localhost
-                </span>
-                <span>main*</span>
-                <span class="hidden sm:inline">// Synchronized with dispatch_server.db</span>
-            </div>
-            
-            <div class="flex items-center gap-4">
-                <span class="hidden md:inline">UTF-8</span>
-                <span class="hidden md:inline">HTML/PHP/Blade</span>
-                <span class="bg-[#0066a1] px-2 py-0.5 font-bold">// SYS_CONNECTED</span>
-            </div>
-        </footer>
+            <!-- IDE Status Bar Footer -->
+            <footer class="relative z-[5] border-t border-ide bg-[#007acc] text-white py-1.5 px-4 font-mono text-[10px] flex justify-between items-center select-none">
+                <div class="flex items-center gap-4">
+                    <span class="bg-[#0066a1] px-2 py-0.5 font-bold flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping"></span>
+                        SSH: localhost
+                    </span>
+                    <span>main*</span>
+                    <span class="hidden sm:inline">// Synchronized with dispatch_server.db</span>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <span class="hidden md:inline">UTF-8</span>
+                    <span class="hidden md:inline">HTML/PHP/Blade</span>
+                    <span class="bg-[#0066a1] px-2 py-0.5 font-bold">// SYS_CONNECTED</span>
+                </div>
+            </footer>
 
-        <!-- Spacer for mobile fixed checkout bar -->
-        @if(request()->is('product/*'))
-            <div class="h-20 lg:hidden"></div>
-        @endif
+            <!-- Spacer for mobile fixed checkout bar -->
+            @if(request()->is('product/*'))
+                <div class="h-20 lg:hidden"></div>
+            @endif
+        </div>
 
         <!-- Random Cyber Hacked Glitch Driver -->
         <script data-navigate-once>
@@ -162,7 +164,7 @@
                 window.cyberGlitchActiveRegistered = true;
 
                 const triggerGlitch = () => {
-                    const target = document.body;
+                    const target = document.getElementById('glitch-wrapper');
                     if (!target) return;
                     
                     target.classList.add('cyber-glitch-active');

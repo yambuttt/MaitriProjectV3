@@ -87,6 +87,20 @@ new class extends Component
                     </a>
                 @endif
 
+                @if(auth()->check())
+                    <!-- User Tab -->
+                    <a href="/login" wire:navigate class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('login') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
+                        <span class="text-emerald-400 font-bold font-mono">key</span>
+                        <span>login.json ({{ auth()->user()->name }})</span>
+                    </a>
+                @else
+                    <!-- Login Tab -->
+                    <a href="/login" wire:navigate class="flex items-center gap-2 px-4 h-full border-r border-ide transition-all duration-150 {{ Request::is('login') ? 'bg-ide-editor border-t-2 border-t-[#007acc] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300' }}">
+                        <span class="text-emerald-400 font-bold font-mono">key</span>
+                        <span>login.json</span>
+                    </a>
+                @endif
+
                 <!-- Other tabs simulated -->
                 <div class="hidden lg:flex items-center gap-2 px-4 h-full border-r border-ide text-slate-600 select-none">
                     <span class="text-emerald-500">go</span>
@@ -228,6 +242,17 @@ new class extends Component
                 <a href="/admin/dashboard" wire:navigate @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
                     <span>// admin_dashboard.rs</span>
                     <span class="text-rose-500 font-bold font-mono">rs</span>
+                </a>
+            @endif
+            @if(auth()->check())
+                <a href="/login" wire:navigate @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
+                    <span>// login.json ({{ auth()->user()->name }})</span>
+                    <span class="text-emerald-400 font-bold font-mono">key</span>
+                </a>
+            @else
+                <a href="/login" wire:navigate @click="mobileMenuOpen = false" class="p-2.5 rounded hover:bg-white/5 text-slate-300 hover:text-white flex items-center justify-between">
+                    <span>// login.json</span>
+                    <span class="text-emerald-400 font-bold font-mono">key</span>
                 </a>
             @endif
         </nav>

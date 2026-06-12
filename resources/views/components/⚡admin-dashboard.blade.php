@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use App\Models\Transaction;
 use App\Models\Product;
 use App\Models\Item;
@@ -10,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 new class extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
-    public string $activeTab = 'overview'; // overview, transactions, products, pricing, terminal
+    public string $activeTab = 'overview'; // overview, transactions, products, pricing, terminal, popup
     
     // Search & filter fields
     public string $searchTransaction = '';
@@ -26,6 +27,14 @@ new class extends Component
     // Shell terminal attributes
     public string $commandInput = '';
     public array $consoleLogs = [];
+
+    // Popup settings attributes
+    public bool $popupActive = false;
+    public string $popupType = 'both'; // text, image, both
+    public string $popupTitle = '';
+    public string $popupText = '';
+    public string $popupImageUrl = '';
+    public $popupImageFile = null;
 
     // Reset pagination when searching
     public function updatingSearchTransaction()
@@ -48,6 +57,17 @@ new class extends Component
         // Initialize price values mapping
         $this->itemPrices = Item::pluck('price', 'id')->toArray();
 
+        // Load popup settings
+        $popupPath = storage_path('app/popup_settings.json');
+        if (file_exists($popupPath)) {
+            $settings = json_decode(file_get_contents($popupPath), true);
+            $this->popupActive = $settings['is_active'] ?? false;
+            $this->popupType = $settings['type'] ?? 'both';
+            $this->popupTitle = $settings['title'] ?? 'SYSTEM_NOTIFICATION';
+            $this->popupText = $settings['text'] ?? '';
+            $this->popupImageUrl = $settings['image_url'] ?? '';
+        }
+
         // Seed welcome traces
         $this->addLog('INFO', 'Admin Security Node initialized successfully.');
         $this->addLog('INFO', 'Establishing tunnel session for user: ' . Auth::user()->name);
@@ -64,10 +84,40 @@ new class extends Component
 
     public function changeTab(string $tab)
     {
-        if (in_array($tab, ['overview', 'transactions', 'products', 'pricing', 'terminal'])) {
+        if (in_array($tab, ['overview', 'transactions', 'products', 'pricing', 'terminal', 'popup'])) {
             $this->activeTab = $tab;
             $this->addLog('INFO', "Switched workspace tab to: {$tab}_mode");
         }
+    }
+
+    public function savePopupSettings()
+    {
+        $settings = [
+            'is_active' => (bool)$this->popupActive,
+            'type' => $this->popupType,
+            'title' => $this->popupTitle,
+            'text' => $this->popupText,
+            'image_url' => $this->popupImageUrl
+        ];
+        
+        file_put_contents(storage_path('app/popup_settings.json'), json_encode($settings, JSON_PRETTY_PRINT));
+        
+        $this->addLog('SUCCESS', 'SYSTEM POPUP: Settings persisted successfully.');
+        session()->flash('popup_saved', 'Popup settings saved successfully!');
+    }
+
+    public function updatedPopupImageFile()
+    {
+        $this->validate([
+            'popupImageFile' => 'image|max:4096', // 4MB Max
+        ]);
+
+        $fileName = 'popup_banner_' . time() . '.' . $this->popupImageFile->getClientOriginalExtension();
+        $this->popupImageFile->storeAs('images', $fileName, 'public');
+        $this->popupImageUrl = '/storage/images/' . $fileName;
+        $this->popupImageFile = null; // Clear state
+
+        $this->addLog('SUCCESS', 'SYSTEM: Popup image uploaded and stored at: ' . $this->popupImageUrl);
     }
 
     public function updateTransactionStatus(int $id, string $status)
@@ -371,6 +421,15 @@ new class extends Component
                             <span class="text-yellow-500 font-bold">sh</span>
                             <span>sys_terminal.sh</span>
                         </button>
+
+                        <button 
+                            wire:click="changeTab('popup')"
+                            @click="mobileSidebarOpen = false"
+                            class="flex items-center gap-2 py-1.5 w-full text-left transition-all duration-150 {{ $activeTab === 'popup' ? 'text-cyan-400 font-bold bg-[#1e1e1e] px-2.5 rounded-sm' : 'text-slate-400 hover:text-slate-200' }}"
+                        >
+                            <span class="text-cyan-400 font-bold">md</span>
+                            <span>popup_banner.md</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -469,6 +528,14 @@ new class extends Component
                                 <span class="text-yellow-500">sh</span>
                                 <span>sys_terminal.sh</span>
                             </button>
+
+                            <button 
+                                wire:click="changeTab('popup')"
+                                class="flex items-center gap-2 py-1 w-full text-left transition-colors {{ $activeTab === 'popup' ? 'text-cyan-400 font-bold bg-[#1e1e1e] px-2 rounded-sm' : 'hover:text-slate-200' }}"
+                            >
+                                <span class="text-cyan-400">md</span>
+                                <span>popup_banner.md</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -543,6 +610,15 @@ new class extends Component
                     >
                         <span>sh</span>
                         <span class="text-[#cccccc]">terminal.sh</span>
+                    </button>
+
+                    <!-- popup_banner.md tab -->
+                    <button 
+                        wire:click="changeTab('popup')"
+                        class="flex items-center gap-1.5 px-3 py-2 bg-ide-editor border-r border-ide transition-all duration-150 shrink-0 h-full {{ $activeTab === 'popup' ? 'border-t-2 border-t-[#007acc] text-cyan-400 font-bold bg-[#181818]' : 'text-slate-500 hover:text-slate-300' }}"
+                    >
+                        <span>md</span>
+                        <span class="text-[#cccccc]">popup_banner.md</span>
                     </button>
                 </div>
                 
@@ -985,6 +1061,181 @@ new class extends Component
                                     class="w-full h-9 pl-8 pr-4 rounded bg-ide-editor border border-ide text-xs placeholder-slate-700 text-[#cccccc] focus:outline-none focus:border-[#007acc] transition-all font-mono"
                                 >
                             </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- View 6: Popup Settings Panel -->
+                @if($activeTab === 'popup')
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between pb-3 border-b border-ide">
+                            <div class="flex items-center gap-2">
+                                <span class="text-cyan-400 font-bold">#</span>
+                                <h3 class="text-sm font-bold text-white uppercase tracking-wider">// POPUP_BANNER_CONFIGURATION</h3>
+                            </div>
+                            <span class="text-[9px] text-slate-500 font-mono">FILE: popup_banner.md</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                            
+                            <!-- Left Column: Settings Form -->
+                            <form wire:submit.prevent="savePopupSettings" class="bg-[#181818] border border-ide p-5 rounded-lg space-y-4 shadow-md font-mono text-xs">
+                                @if (session()->has('popup_saved'))
+                                    <div class="p-3 bg-emerald-950/40 border border-emerald-800/40 rounded text-emerald-400 font-bold mb-3 select-none flex items-center gap-2 animate-pulse">
+                                        <span>✔</span>
+                                        <span>{{ session('popup_saved') }}</span>
+                                    </div>
+                                @endif
+
+                                <!-- Toggle Active -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[#569cd6] font-bold block">// const popup_active = boolean;</label>
+                                    <div class="flex items-center gap-2">
+                                        <button 
+                                            type="button"
+                                            wire:click="$set('popupActive', true)"
+                                            class="px-4 py-1.5 rounded font-mono font-bold text-xs uppercase border transition-all duration-150 {{ $popupActive ? 'bg-emerald-950/80 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] font-black' : 'bg-[#252526] border-ide text-slate-500 hover:text-slate-300' }}"
+                                        >
+                                            TRUE (Aktif)
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            wire:click="$set('popupActive', false)"
+                                            class="px-4 py-1.5 rounded font-mono font-bold text-xs uppercase border transition-all duration-150 {{ !$popupActive ? 'bg-rose-950/80 border-rose-500 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.3)] font-black' : 'bg-[#252526] border-ide text-slate-500 hover:text-slate-300' }}"
+                                        >
+                                            FALSE (Nonaktif)
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Popup Title -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[#569cd6] font-bold block">// const popup_title = string;</label>
+                                    <input 
+                                        wire:model="popupTitle" 
+                                        type="text" 
+                                        class="w-full h-8 px-3 rounded bg-ide-editor border border-ide text-[#cccccc] focus:outline-none focus:border-[#007acc]"
+                                        placeholder="SYSTEM_NOTIFICATION"
+                                    >
+                                </div>
+
+                                <!-- Content Type -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[#569cd6] font-bold block">// const content_mode = enum;</label>
+                                    <select 
+                                        wire:model="popupType" 
+                                        class="w-full h-8 px-2 rounded bg-ide-editor border border-ide text-[#cccccc] focus:outline-none focus:border-[#007acc]"
+                                    >
+                                        <option value="text">text (Hanya Teks)</option>
+                                        <option value="image">image (Hanya Gambar)</option>
+                                        <option value="both">both (Teks & Gambar)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Image URL & Upload -->
+                                <div class="space-y-2 border border-ide p-3 rounded bg-[#1e1e1e]/40">
+                                    <label class="text-[#569cd6] font-bold block">// const banner_image = string | File;</label>
+                                    
+                                    <div class="flex flex-col gap-2">
+                                        <div class="flex items-center gap-3">
+                                            <label class="px-3 py-1.5 bg-[#252526] hover:bg-[#2d2d30] border border-ide text-[#cccccc] cursor-pointer rounded text-[11px] font-bold transition-all flex items-center gap-1.5 select-none hover:border-cyan-500/50">
+                                                <span>📂 UPLOAD BANNER</span>
+                                                <input 
+                                                    type="file" 
+                                                    wire:model="popupImageFile" 
+                                                    accept="image/*" 
+                                                    class="hidden"
+                                                >
+                                            </label>
+                                            <div wire:loading wire:target="popupImageFile" class="text-cyan-400 text-[10px] animate-pulse font-mono">
+                                                [UPLOADING_PAYLOAD...]
+                                            </div>
+                                        </div>
+                                        
+                                        <input 
+                                            wire:model="popupImageUrl" 
+                                            type="text" 
+                                            class="w-full h-8 px-3 rounded bg-ide-editor border border-ide text-[#cccccc] focus:outline-none focus:border-[#007acc]"
+                                            placeholder="/images/cyber_promo.png"
+                                        >
+                                        <span class="text-[9px] text-slate-500 font-mono">// Upload file baru untuk mengganti gambar otomatis, atau masukkan URL path di atas.</span>
+                                    </div>
+                                </div>
+
+                                <!-- Text Content -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[#569cd6] font-bold block">// const markdown_body_text = string;</label>
+                                    <textarea 
+                                        wire:model="popupText" 
+                                        rows="4"
+                                        class="w-full p-3 rounded bg-ide-editor border border-ide text-[#cccccc] focus:outline-none focus:border-[#007acc] leading-relaxed font-mono"
+                                        placeholder="Tulis pesan pengumuman di sini..."
+                                    ></textarea>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="pt-2 flex justify-end">
+                                    <button 
+                                        type="submit" 
+                                        class="px-5 py-2 bg-[#007acc] hover:bg-[#0062a3] text-white font-bold rounded shadow-md transition-all flex items-center gap-1.5 font-mono text-xs uppercase"
+                                    >
+                                        <span>COMMIT_CHANGES (SIMPAN) ▶</span>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Right Column: Live Compiler Render (Preview) -->
+                            <div class="bg-[#181818] border border-ide p-5 rounded-lg flex flex-col shadow-md font-mono text-xs">
+                                <span class="text-slate-500 font-bold mb-3">// LIVE_COMPILER_RENDER: preview</span>
+                                
+                                <div class="bg-[#1e1e1e] border border-cyan-500/20 rounded-md overflow-hidden flex flex-col shadow-inner select-none scale-95 origin-top">
+                                    <!-- Preview Header -->
+                                    <div class="h-8 border-b border-[#2b2b2b] bg-[#202020] px-3 flex items-center justify-between text-[#858585]">
+                                        <div class="flex items-center gap-1">
+                                            <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/80"></span>
+                                            <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80"></span>
+                                            <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80"></span>
+                                            <span class="ml-1.5 text-[9px] text-slate-500">// @{{ popupTitle || 'SYSTEM_NOTIFICATION' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Preview Content -->
+                                    <div class="p-4 space-y-3 max-h-[300px] overflow-y-auto">
+                                        @if($popupType === 'image' || $popupType === 'both')
+                                            @if(!empty($popupImageUrl))
+                                                <div class="rounded border border-white/5 overflow-hidden bg-slate-900">
+                                                    <img src="{{ $popupImageUrl }}" alt="Preview Image" class="w-full h-auto object-cover max-h-32">
+                                                </div>
+                                            @else
+                                                <div class="h-24 rounded border border-dashed border-slate-700 bg-slate-900/50 flex items-center justify-center text-slate-500">
+                                                    // No Image Set
+                                                </div>
+                                            @endif
+                                        @endif
+
+                                        @if($popupType === 'text' || $popupType === 'both')
+                                            @if(!empty($popupText))
+                                                <div class="space-y-1.5 leading-relaxed text-[#cccccc]">
+                                                    <div class="text-[8px] text-[#569cd6] font-bold">// CONTENT_STREAM</div>
+                                                    <p class="whitespace-pre-line text-[10px] font-sans text-slate-300">{{ $popupText }}</p>
+                                                </div>
+                                            @else
+                                                <div class="py-4 text-center text-slate-600 italic">
+                                                    // No Text Content Set
+                                                </div>
+                                            @endif
+                                        @endif
+                                    </div>
+
+                                    <!-- Preview Footer -->
+                                    <div class="p-2 border-t border-[#2b2b2b] bg-[#1a1a1a] flex justify-end">
+                                        <span class="px-2.5 py-1 bg-cyan-900/40 text-cyan-400 font-bold text-[8px] border border-cyan-800/30 rounded font-mono uppercase">
+                                            DISMISS
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 @endif

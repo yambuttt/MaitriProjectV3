@@ -119,49 +119,51 @@
         <!-- Editor background grids -->
         <div class="absolute inset-0 editor-grid pointer-events-none z-0"></div>
 
-        <!-- Custom Dedicated Admin Header (VS Code Editor Vibe, but restricted workspace) -->
-        <header class="relative z-50 w-full border-b border-ide bg-[#181818] h-12 px-4 sm:px-6 flex items-center justify-between text-xs text-[#858585]">
-            <div class="flex items-center gap-3 truncate">
-                <!-- MacOS style dots -->
-                <div class="flex gap-1.5 shrink-0">
-                    <span class="window-dot dot-close"></span>
-                    <span class="window-dot dot-min"></span>
-                    <span class="window-dot dot-max"></span>
+        <div id="glitch-wrapper" class="min-h-screen flex flex-col relative z-10">
+            <!-- Custom Dedicated Admin Header (VS Code Editor Vibe, but restricted workspace) -->
+            <header class="relative z-50 w-full border-b border-ide bg-[#181818] h-12 px-4 sm:px-6 flex items-center justify-between text-xs text-[#858585]">
+                <div class="flex items-center gap-3 truncate">
+                    <!-- MacOS style dots -->
+                    <div class="flex gap-1.5 shrink-0">
+                        <span class="window-dot dot-close"></span>
+                        <span class="window-dot dot-min"></span>
+                        <span class="window-dot dot-max"></span>
+                    </div>
+                    <div class="border-l border-ide pl-3 ml-1.5 text-slate-400 font-bold shrink-0">
+                        MAITRI_CONSOLE
+                    </div>
+                    <span class="text-slate-600 hidden sm:inline truncate">// root@dispatch_server:~/dashboard</span>
                 </div>
-                <div class="border-l border-ide pl-3 ml-1.5 text-slate-400 font-bold shrink-0">
-                    MAITRI_CONSOLE
+
+                <div class="flex items-center gap-4 text-[10px] font-bold shrink-0">
+                    <span class="hidden md:inline text-slate-600">BRANCH: main*</span>
+                    <span class="text-[#4ec9b0]">MODE: ADMIN_WORKSPACE</span>
                 </div>
-                <span class="text-slate-600 hidden sm:inline truncate">// root@dispatch_server:~/dashboard</span>
-            </div>
+            </header>
 
-            <div class="flex items-center gap-4 text-[10px] font-bold shrink-0">
-                <span class="hidden md:inline text-slate-600">BRANCH: main*</span>
-                <span class="text-[#4ec9b0]">MODE: ADMIN_WORKSPACE</span>
-            </div>
-        </header>
+            <!-- Main Workspace dedicated container -->
+            <main class="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-6 min-h-[calc(100vh-80px)] flex-1">
+                {{ $slot }}
+            </main>
 
-        <!-- Main Workspace dedicated container -->
-        <main class="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-6 min-h-[calc(100vh-80px)]">
-            {{ $slot }}
-        </main>
-
-        <!-- Dedicated Admin Status Bar Footer -->
-        <footer class="relative z-50 border-t border-ide bg-[#181818] text-[#858585] py-1.5 px-4 text-[10px] flex justify-between items-center select-none font-mono">
-            <div class="flex items-center gap-4">
-                <span class="bg-[#007acc] text-white px-2 py-0.5 font-bold flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping"></span>
-                    SSH: connected
-                </span>
-                <span class="hidden sm:inline">DB: SQLite</span>
-                <span class="hidden sm:inline">Vite: v8.0.16</span>
-            </div>
-            
-            <div class="flex items-center gap-4">
-                <span>UTF-8</span>
-                <span>PHP/Livewire v4</span>
-                <span class="text-cyan-400 font-bold">// SECURE_TUNNEL_ESTABLISHED</span>
-            </div>
-        </footer>
+            <!-- Dedicated Admin Status Bar Footer -->
+            <footer class="relative z-50 border-t border-ide bg-[#181818] text-[#858585] py-1.5 px-4 text-[10px] flex justify-between items-center select-none font-mono">
+                <div class="flex items-center gap-4">
+                    <span class="bg-[#007acc] text-white px-2 py-0.5 font-bold flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping"></span>
+                        SSH: connected
+                    </span>
+                    <span class="hidden sm:inline">DB: SQLite</span>
+                    <span class="hidden sm:inline">Vite: v8.0.16</span>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <span>UTF-8</span>
+                    <span>PHP/Livewire v4</span>
+                    <span class="text-cyan-400 font-bold">// SECURE_TUNNEL_ESTABLISHED</span>
+                </div>
+            </footer>
+        </div>
 
         <!-- Random Cyber Hacked Glitch Driver -->
         <script data-navigate-once>
@@ -170,7 +172,7 @@
                 window.cyberGlitchActiveRegistered = true;
 
                 const triggerGlitch = () => {
-                    const target = document.body;
+                    const target = document.getElementById('glitch-wrapper');
                     if (!target) return;
                     
                     target.classList.add('cyber-glitch-active');
