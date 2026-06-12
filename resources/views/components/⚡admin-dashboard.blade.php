@@ -112,18 +112,10 @@ new class extends Component
             'popupImageFile' => 'image|max:4096', // 4MB Max
         ]);
 
-        $fileName = 'popup_banner_' . time() . '.' . $this->popupImageFile->getClientOriginalExtension();
+        $fileName = $this->popupImageFile->hashName();
+        $this->popupImageFile->storeAs('uploads/popup', $fileName, 'public');
         
-        $destinationDir = public_path('images');
-        if (!file_exists($destinationDir)) {
-            mkdir($destinationDir, 0755, true);
-        }
-
-        $destinationPath = $destinationDir . '/' . $fileName;
-        copy($this->popupImageFile->getRealPath(), $destinationPath);
-        chmod($destinationPath, 0644); // Make it world-readable for cPanel Apache
-        
-        $this->popupImageUrl = '/images/' . $fileName;
+        $this->popupImageUrl = '/storage/uploads/popup/' . $fileName;
         $this->popupImageFile = null; // Clear state
 
         $this->addLog('SUCCESS', 'SYSTEM: Popup image uploaded and stored at: ' . $this->popupImageUrl);
